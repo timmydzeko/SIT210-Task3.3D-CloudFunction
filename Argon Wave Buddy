@@ -1,0 +1,77 @@
+/*
+------------------------------------------------------
+Buddy System Wave Reception Program - By Timothy Moore
+------------------------------------------------------
+
+This .cpp program is designed to receive a published event from 
+a Particle Photon device set up in Deakin University's RIOT 
+lab. The event published is supposed to mock a human waving 
+in front of a motion sensor. This event has been subscribed
+to, prompting a response from my Argon. In lieu of sending 
+a proper response, this task asks only to demonstrate that 
+the buddy Photon has sent a wave, via a flashing LED.
+
+------------------------------------------------------
+*/
+
+// Setting pins for LED's
+int extLED = D4;
+int builtInLED = D7;
+
+//  Setting number of flashes for each event
+int wave = 3;
+int pat = 5;
+
+//  Function to loop until number of determined flashes is reached
+void receivedSignal(int signal)
+{
+    
+    for(int i = 0; i < signal; i++) // Will loop until i is equal to the signal value passed in 
+    {
+        //  Turns LED's on
+        digitalWrite(extLED, HIGH);
+        digitalWrite(builtInLED, HIGH);
+    
+        delay(500);
+        
+        //Turns LED's off
+        digitalWrite(extLED, LOW);
+        digitalWrite(builtInLED, LOW);
+    
+        delay(500);
+    }
+}
+
+
+
+//  Runs on initialisation
+void setup() 
+{
+    //  Sets both pins used to OUTPUT
+    pinMode(extLED, OUTPUT);
+    pinMode(builtInLED, OUTPUT);
+    
+    //  Subscribes to the buddy Particle Photon's event, runs the myHandler instructions when event received
+    Particle.subscribe("Deakin_RIOT_SIT210_Photon_Buddy", myHandler);
+}
+
+//  Tells the Argon what to do when the subscribed event is received
+void myHandler(const char *event, const char *data) 
+{
+    //  Checks to see if the data received from the event is the string value "wave"
+    if (strcmp (data, "wave") == 0)
+    {
+        //  Run the receivedSignal function passing the number of flashes a wave is denoted as
+        receivedSignal(wave);
+    }
+    //  Checks to see if the data received from the event is the string value "pat"
+    else if (strcmp (data, "pat") == 0)
+    {
+        //  Run the receivedSignal function passing the number of flashes a pat is denoted as
+        receivedSignal(pat);
+    }
+}
+
+void loop() {
+//  Left empty. Will continue to loop keeping the program running until the power supply is cut.
+}
